@@ -133,12 +133,6 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
             case R.id.accelerometer:
                 sendDataMQTT(textViews[TOPIC_ACCELEROMETER].getText() + "", TOPIC_ACCELEROMETER);
                 break;
-//            case R.id.button2:
-//                MapObj obj = new MapObj("Danh", 10.4273388, 107.3005107, 16.5);
-//                sendObjMQTT(obj);
-//
-//
-//                break;
 
         }
 
@@ -161,13 +155,11 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
         try {
             runOnUiThread(() -> {
                 bufferUART += new String(data);
-                //Toast.makeText(getApplicationContext(), bufferUART , Toast.LENGTH_SHORT).show();
                 if (bufferUART.contains("#") && bufferUART.contains("!")) {
                     //TODO
                     int index_soc = bufferUART.indexOf("#");
                     int index_eof = bufferUART.indexOf("!");
                     String cmd = bufferUART.substring(index_soc + 1, index_eof);
-//                String[] cmd_parsed = cmd.split("\\s");
                     messageUART = new EncryptionUART(cmd, Constants.KEY);
                     cmd = messageUART.decryptUART();
 
@@ -468,32 +460,6 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
                         throw new IllegalStateException("Unexpected value: " + topic);
                 }
                 return;
-//
-//                try {
-//                    JSONObject jsonObjectReceive = new JSONObject(mqttMessage.toString());
-//                    String ID = jsonObjectReceive.getString("id");
-//                    String name = jsonObjectReceive.getString("name");
-//                    String value = jsonObjectReceive.getString("data");
-//                    String databaseName, databaseID, databaseFeed;
-//                    for (int i = 0; i < Constants.NUM_DEVICES; i++) {
-//                        JSONObject jsonObjectTemp = jsonArray.getJSONObject(i);
-//                        databaseName = jsonObjectTemp.getString("name");
-//                        databaseID = jsonObjectTemp.getString("id");
-//                        Log.d("------------------Topic", "bruh:" + topic);
-//                        if (ID.equals(databaseID) && name.equals(databaseName)) {
-//                            updateTextView(ID, value);
-//                            break;
-//                        }
-//                    }
-//                    dataToGateway = "!" + ID + ":" + value + "#";
-//                } catch (JSONException e) {
-//                    Log.e("JSONException", "Error: " + e.toString());
-//                }
-//                try {
-//                    port.write(dataToGateway.getBytes(), 1000);
-//                } catch (Exception e) {
-//
-//                }
             }
 
             @Override
