@@ -83,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
     double buffer_index = 0.0;
     DataPoint[] dataPointLight = new DataPoint[MAX_X];
     LineGraphSeries<DataPoint> series;
-    MyTask task;
     MQTTHelper mqttHelper;
     final String TAG = "IOT_FINAL";
     TextView[] textViews = new TextView[NUM_SENSORS];
@@ -113,8 +112,6 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
         setupWDT();
         openUART();
         initNotificationChannel();
-        task = new MyTask();
-        task.execute();
         startMQTT();
         getLocation();
 
@@ -505,50 +502,6 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
 
             }
         });
-    }
-
-
-    private class MyTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-//            try {
-//                String apiURL = "http://dadn.esp32thanhdanh.link";
-//                if (!apiURL.equals("none")) {
-//                    Log.d("apiURL", apiURL);
-//                    Log.d("length", Integer.toString(apiURL.length()));
-//                    getKey(apiURL);
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-//            Log.i("KEY RESPONSE", keyResponse);
-//            String split []=keyResponse.split("\"");
-//            split = split[3].split(":");
-//            dynamicKey1 = split[0];
-//            dynamicKey2 = split[1];
-//            Log.i("KEY1", dynamicKey1);
-//            Log.i("KEY2", dynamicKey2);
-//            startMQTT();
-//            myAsyncTask = new myTask();
-//            myAsyncTask.execute();
-        }
     }
 
 
