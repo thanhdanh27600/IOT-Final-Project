@@ -47,7 +47,6 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Timer;
@@ -75,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
         public static final int UPLOAD_PERIOD = 30;
         public static final String CHANNEL_ID = "Adafruit";
         public static final String TOPIC_LED_PATH= "thanhdanh27600/f/iot-led";
-        public static final int SEND_LOCATION_FLAG = 0;
+        public static final int SEND_LOCATION_FLAG = 1;
     }
     double buffer_index = 0d;
     GraphView graphViewLight;
