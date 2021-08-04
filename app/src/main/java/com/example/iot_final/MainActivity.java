@@ -48,6 +48,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -70,18 +71,19 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
         public static final int TOPIC_LONGITUDE = 4;
         public static final int TOPIC_LATITUDE = 5;
         public static final int TOPIC_LED = 6;
-        public static final int MAX_X = 10;
+        public static final int MAX_X = 40;
         public static final int UPLOAD_PERIOD = 30;
         public static final String CHANNEL_ID = "Adafruit";
         public static final String TOPIC_LED_PATH= "thanhdanh27600/f/iot-led";
-
-
+        public static final int SEND_LOCATION_FLAG = 0;
     }
-
+    double buffer_index = 0d;
     GraphView graphViewLight;
-    double buffer_index = 0.0;
-    DataPoint[] dataPointLight = new DataPoint[MAX_X];
-    LineGraphSeries<DataPoint> series;
+    GraphView graphViewTemp;
+    double latest_light_value = Double.MIN_VALUE;
+    double latest_temp_value = Double.MIN_VALUE;
+    LineGraphSeries<DataPoint> series1;
+    LineGraphSeries<DataPoint> series2;
     MQTTHelper mqttHelper;
     final String TAG = "IOT_FINAL";
     TextView[] textViews = new TextView[NUM_SENSORS];
@@ -93,8 +95,7 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
     EncryptionUART messageUART;
     String ADA_KEY = "aio_ftIB86Yh38Gd" + "ufYcdKbI8YoYVl6K";
     int wdt_counter = UPLOAD_PERIOD;
-    private Timer timer = new Timer();
-
+    private final Timer timer = new Timer();
     private static final String ACTION_USB_PERMISSION = "com.android.recipes.USB_PERMISSION";
     private static final String INTENT_ACTION_GRANT_USB = BuildConfig.APPLICATION_ID + ".GRANT_USB";
     UsbSerialPort port;
@@ -113,8 +114,6 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
         initNotificationChannel();
         startMQTT();
         getLocation();
-
-
     }
 
 
@@ -175,26 +174,9 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
                         textViews[TOPIC_TEMPERATURE].setText(jsonUART.getString("t"));
                         textViews[TOPIC_COMPASS].setText(mapCompass(jsonUART.getString("d")));
                         textViews[TOPIC_ACCELEROMETER].setText(mapAccelerometer(jsonUART.getString("a")));
+                        latest_light_value = Double.parseDouble(jsonUART.getString("l"));
+                        latest_temp_value = Double.parseDouble(jsonUART.getString("t"));
 
-
-                        int previousX = ((int) buffer_index >= MAX_X) ? MAX_X - 1 : (int) buffer_index;
-                        if (dataPointLight[previousX].getY() != Double.parseDouble(jsonUART.getString("l"))) {
-                            if (previousX == MAX_X - 1) {
-                                for (int index = 1; index < MAX_X; index++) {
-                                    dataPointLight[index - 1] = dataPointLight[index];
-                                }
-                            }
-                            else{
-                                for (int i = previousX + 1; i< MAX_X; i++){
-                                    dataPointLight[i] = new DataPoint(previousX, Double.parseDouble(jsonUART.getString("l")));
-                                }
-                            }
-
-                            dataPointLight[previousX] = new DataPoint(buffer_index, Double.parseDouble(jsonUART.getString("l")));
-                            series = new LineGraphSeries<>(dataPointLight);
-                            showDataOnGraph(series, graphViewLight);
-                            buffer_index++;
-                        }
 
                     } catch (JSONException e) {
                         Toast.makeText(getApplicationContext(), "Cannot Parse Value", Toast.LENGTH_SHORT).show();
@@ -258,16 +240,23 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
     public void initGraph() {
         graphViewLight = findViewById(R.id.graphLightLevel);
         graphViewLight.getLegendRenderer().setVisible(true);
+        graphViewLight.getGridLabelRenderer().setGridColor(R.color.main_card);
         graphViewLight.getViewport().setScalable(true);
+        graphViewLight.getViewport().setXAxisBoundsManual(true);
+        graphViewLight.getViewport().setMinX(0);
+        graphViewLight.getViewport().setMaxX(MAX_X);
         graphViewLight.setTitle("Light intensity (30s refresh)");
-        graphViewLight.getGridLabelRenderer().setGridColor(Color.DKGRAY);
+        series1 = new LineGraphSeries<>();
+        showDataOnGraph(series1, graphViewLight);
 
-        for (int i = 0; i < MAX_X; i++) {
-            dataPointLight[i] = new DataPoint(0, 0);
-        }
-        series = new LineGraphSeries<>(dataPointLight);
-        showDataOnGraph(series, graphViewLight);
-
+        graphViewTemp = findViewById(R.id.graphTempLevel);
+        graphViewTemp.getLegendRenderer().setVisible(true);
+        graphViewTemp.getGridLabelRenderer().setGridColor(R.color.main_card);
+        graphViewTemp.getViewport().setScalable(true);
+        graphViewTemp.setTitle("Temperature (°C) (30s refresh)");
+        series2 = new LineGraphSeries<>();
+        series2.setColor(Color.rgb(255,0,0));
+        showDataOnGraph(series2, graphViewTemp);
     }
 
     public void initTextView() {
@@ -286,6 +275,7 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
         }
 
         findViewById(R.id.line_wrapper).setVisibility(View.GONE);
+        findViewById(R.id.temp_wrapper).setVisibility(View.GONE);
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -297,12 +287,14 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
                         findViewById(R.id.location_wrapper).setVisibility(View.GONE);
                         findViewById(R.id.led_wrapper).setVisibility(View.GONE);
                         findViewById(R.id.line_wrapper).setVisibility(View.VISIBLE);
+                        findViewById(R.id.temp_wrapper).setVisibility(View.VISIBLE);
                         break;
                     case R.id.dashboard:
                         findViewById(R.id.dashboard_wrapper).setVisibility(View.VISIBLE);
                         findViewById(R.id.led_wrapper).setVisibility(View.VISIBLE);
                         findViewById(R.id.location_wrapper).setVisibility(View.VISIBLE);
                         findViewById(R.id.line_wrapper).setVisibility(View.GONE);
+                        findViewById(R.id.temp_wrapper).setVisibility(View.GONE);
                         break;
                 }
                 return true;
@@ -322,28 +314,18 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
             UsbSerialDriver driver = availableDrivers.get(0);
             UsbDeviceConnection connection = manager.openDevice(driver.getDevice());
             if (connection == null) {
-
                 PendingIntent usbPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(INTENT_ACTION_GRANT_USB), 0);
                 manager.requestPermission(driver.getDevice(), usbPermissionIntent);
-
                 manager.requestPermission(driver.getDevice(), PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0));
-
-
                 return;
             } else {
-
                 port = driver.getPorts().get(0);
                 try {
                     port.open(connection);
-                    //port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
                     port.setParameters(9600, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
-
-                    //port.write("ABC#".getBytes(), 1000);
-
                     SerialInputOutputManager usbIoManager = new SerialInputOutputManager(port, this);
                     Executors.newSingleThreadExecutor().submit(usbIoManager);
                     Toast.makeText(MainActivity.this, "UART is openned", Toast.LENGTH_SHORT).show();
-
                 } catch (Exception e) {
                     Toast.makeText(MainActivity.this, "UART is erorr", Toast.LENGTH_SHORT).show();
                 }
@@ -374,7 +356,7 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
         msg.setId((int) Math.round(Math.random() * 1001));
         msg.setQos(0);
         try {
-            byte[] b = obj.toJSON().toString().getBytes(Charset.forName("UTF-8"));
+            byte[] b = obj.toJSON().toString().getBytes(StandardCharsets.UTF_8);
             msg.setPayload(b);
             Log.d("IOT_MQTT", "Publish :" + msg);
             mqttHelper.mqttAndroidClient.publish("thanhdanh27600/feeds/iot-final", msg);
@@ -390,7 +372,7 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
         msg.setQos(0);
 
         try {
-            byte[] b = data.getBytes(Charset.forName("UTF-8"));
+            byte[] b = data.getBytes(StandardCharsets.UTF_8);
             msg.setPayload(b);
             Log.d("IOT_MQTT", "Publish :" + msg);
 
@@ -429,8 +411,6 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
 
             @Override
             public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
-
-
                 switch (topic){
                     case Constants.TOPIC_LED_PATH:
                         Log.i("MQTT", "TOPIC:" + topic + "MESSAGE:"+ mqttMessage.toString());
@@ -467,6 +447,13 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
 
             }
         });
+    }
+
+    private void updateLightTemp(){
+        if (latest_light_value == Double.MIN_VALUE || latest_temp_value == Double.MIN_VALUE) return;
+        buffer_index++;
+        series1.appendData(new DataPoint(buffer_index, latest_light_value),true, MAX_X);
+        series2.appendData(new DataPoint(buffer_index, latest_temp_value),true, MAX_X);
     }
 
 
@@ -528,8 +515,9 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
                     wdt_counter--;
                     if (wdt_counter < 0) {
                         wdt_counter = UPLOAD_PERIOD;
+                        updateLightTemp();
                         MapObj obj = new MapObj("Danh", latitude, longitude);
-                        sendObjMQTT(obj);
+                        if(Constants.SEND_LOCATION_FLAG == 1 )sendObjMQTT(obj);
                     }
                     textViewRemain.setText("next upload:" + wdt_counter);
                 }

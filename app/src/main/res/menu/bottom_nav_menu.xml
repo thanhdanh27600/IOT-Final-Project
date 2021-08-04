@@ -8,7 +8,7 @@
     <item
         android:id="@+id/line"
         android:icon="@drawable/ic_action_name"
-        android:title="Line" />
+        android:title="Chart" />
 
 
 </menu>

@@ -6,7 +6,9 @@
     android:layout_height="match_parent"
     android:background="#ffffff"
     android:orientation="vertical"
-    android:padding="15dp"
+    android:paddingTop="15dp"
+    android:paddingLeft="15dp"
+    android:paddingRight="15dp"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -119,13 +121,12 @@
                     android:layout_height="match_parent"
                     android:layout_margin="3dp"
                     android:layout_weight="1"
-                    android:background="@color/main_card"
+                    android:background="@drawable/layout_bg"
                     android:orientation="vertical">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-
                         android:gravity="center"
                         android:text="LIGHT"
                         android:textColor="@color/colorTextCaption"
@@ -134,8 +135,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:orientation="horizontal"
-                        >
+                        android:orientation="horizontal">
 
                         <TextView
                             android:id="@+id/light"
@@ -143,13 +143,13 @@
                             android:layout_height="match_parent"
                             android:layout_margin="2dp"
                             android:layout_weight="2"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:clickable="true"
                             android:gravity="center_horizontal|center_vertical"
                             android:text="\?"
                             android:textColor="@color/colorTextCaption"
                             android:textSize="38sp"
-                            android:textStyle="bold"
-                            android:background="?android:attr/selectableItemBackground"
-                            android:clickable="true"/>
+                            android:textStyle="bold" />
 
                     </LinearLayout>
 
@@ -160,7 +160,7 @@
                     android:layout_height="match_parent"
                     android:layout_margin="3dp"
                     android:layout_weight="1"
-                    android:background="@color/main_card"
+                    android:background="@drawable/layout_bg"
                     android:orientation="vertical">
 
                     <TextView
@@ -200,7 +200,7 @@
                     android:layout_height="match_parent"
                     android:layout_margin="3dp"
                     android:layout_weight="1"
-                    android:background="@color/main_card"
+                    android:background="@drawable/layout_bg"
                     android:orientation="vertical">
 
                     <TextView
@@ -240,7 +240,7 @@
                     android:layout_height="match_parent"
                     android:layout_margin="3dp"
                     android:layout_weight="1"
-                    android:background="@color/main_card"
+                    android:background="@drawable/layout_bg"
                     android:orientation="vertical">
 
                     <TextView
@@ -290,7 +290,7 @@
                     android:layout_height="match_parent"
                     android:layout_margin="3dp"
                     android:layout_weight="1"
-                    android:background="@color/main_card"
+                    android:background="@drawable/layout_bg"
                     android:orientation="vertical">
 
                     <TextView
@@ -328,7 +328,7 @@
                     android:layout_height="match_parent"
                     android:layout_margin="3dp"
                     android:layout_weight="1"
-                    android:background="@color/main_card"
+                    android:background="@drawable/layout_bg"
                     android:orientation="vertical">
 
                     <TextView
@@ -376,7 +376,7 @@
                     android:layout_height="match_parent"
                     android:layout_margin="3dp"
                     android:layout_weight="1"
-                    android:background="@color/main_card"
+                    android:background="@drawable/layout_bg"
                     android:orientation="vertical">
 
                     <TextView
@@ -434,7 +434,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@color/main_card"
+                        android:background="@drawable/layout_bg"
                         android:gravity="center"
                         android:text="Light Level"
                         android:textColor="@color/colorTextCaption"
@@ -459,23 +459,63 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/temp_wrapper"
+                android:layout_width="match_parent"
+                android:layout_height="500dp"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                android:padding="10dp">
+
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="3dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginBottom="3dp"
+                    android:layout_weight="6"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/layout_bg"
+                        android:gravity="center"
+                        android:text="Temperature Level"
+                        android:textColor="@color/colorTextCaption"
+                        android:textSize="@dimen/caption_media_size" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:padding="30dp">
+
+                        <com.jjoe64.graphview.GraphView
+                            android:id="@+id/graphTempLevel"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="2dp"
+                            android:background="#ffffff"
+                            />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
         </LinearLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="75dp">
 
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottomNavigationView"
-            android:layout_width="match_parent"
-            android:layout_height="75dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintVertical_bias="1.0"
-            app:menu="@menu/bottom_nav_menu" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        app:menu="@menu/bottom_nav_menu" />
 
 
 </LinearLayout>
