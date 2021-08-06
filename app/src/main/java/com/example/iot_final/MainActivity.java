@@ -28,6 +28,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -107,12 +109,12 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initTextView();
-        initGraph();
-        setupWDT();
-        openUART();
-        initNotificationChannel();
-        startMQTT();
-        getLocation();
+//        initGraph();
+//        setupWDT();
+//        openUART();
+//        initNotificationChannel();
+//        startMQTT();
+//        getLocation();
     }
 
 
@@ -259,46 +261,50 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
     }
 
     public void initTextView() {
-        textViews[TOPIC_LIGHT] = findViewById(R.id.light);
-        textViews[TOPIC_TEMPERATURE] = findViewById(R.id.temperature);
-        textViews[TOPIC_COMPASS] = findViewById(R.id.compass);
-        textViews[TOPIC_ACCELEROMETER] = findViewById(R.id.accelerometer);
-        textViews[TOPIC_LONGITUDE] = findViewById(R.id.longtitude);
-        textViews[TOPIC_COMPASS] = findViewById(R.id.compass);
-        textViews[TOPIC_LATITUDE] = findViewById(R.id.latitude);
-        textViews[TOPIC_LED] = findViewById(R.id.led);
-        textViewRemain = findViewById(R.id.remain);
+//        textViews[TOPIC_LIGHT] = findViewById(R.id.light);
+//        textViews[TOPIC_TEMPERATURE] = findViewById(R.id.temperature);
+//        textViews[TOPIC_COMPASS] = findViewById(R.id.compass);
+//        textViews[TOPIC_ACCELEROMETER] = findViewById(R.id.accelerometer);
+//        textViews[TOPIC_LONGITUDE] = findViewById(R.id.longtitude);
+//        textViews[TOPIC_COMPASS] = findViewById(R.id.compass);
+//        textViews[TOPIC_LATITUDE] = findViewById(R.id.latitude);
+//        textViews[TOPIC_LED] = findViewById(R.id.led);
+//        textViewRemain = findViewById(R.id.remain);
+//
+//        for (int i = TOPIC_LIGHT; i <= TOPIC_ACCELEROMETER; i++){
+//            textViews[i].setOnClickListener(this);
+//        }
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
-        for (int i = TOPIC_LIGHT; i <= TOPIC_ACCELEROMETER; i++){
-            textViews[i].setOnClickListener(this);
-        }
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentContainerView);
+        NavigationUI.setupWithNavController(bottomNavigationView, navHostFragment.getNavController());
+//        findViewById(R.id.line_wrapper).setVisibility(View.GONE);
+//        findViewById(R.id.temp_wrapper).setVisibility(View.GONE);
+//        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+//        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+//            @Override
+//            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+//                int id = item.getItemId();
+//                switch (id) {
+//                    case R.id.line:
+//                        findViewById(R.id.dashboard_wrapper).setVisibility(View.GONE);
+//                        findViewById(R.id.location_wrapper).setVisibility(View.GONE);
+//                        findViewById(R.id.led_wrapper).setVisibility(View.GONE);
+//                        findViewById(R.id.line_wrapper).setVisibility(View.VISIBLE);
+//                        findViewById(R.id.temp_wrapper).setVisibility(View.VISIBLE);
+//                        break;
+//                    case R.id.dashboard:
+//                        findViewById(R.id.dashboard_wrapper).setVisibility(View.VISIBLE);
+//                        findViewById(R.id.led_wrapper).setVisibility(View.VISIBLE);
+//                        findViewById(R.id.location_wrapper).setVisibility(View.VISIBLE);
+//                        findViewById(R.id.line_wrapper).setVisibility(View.GONE);
+//                        findViewById(R.id.temp_wrapper).setVisibility(View.GONE);
+//                        break;
+//                }
+//                return true;
+//            }
+//        });
 
-        findViewById(R.id.line_wrapper).setVisibility(View.GONE);
-        findViewById(R.id.temp_wrapper).setVisibility(View.GONE);
-        bottomNavigationView = findViewById(R.id.bottomNavigationView);
-        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
-                switch (id) {
-                    case R.id.line:
-                        findViewById(R.id.dashboard_wrapper).setVisibility(View.GONE);
-                        findViewById(R.id.location_wrapper).setVisibility(View.GONE);
-                        findViewById(R.id.led_wrapper).setVisibility(View.GONE);
-                        findViewById(R.id.line_wrapper).setVisibility(View.VISIBLE);
-                        findViewById(R.id.temp_wrapper).setVisibility(View.VISIBLE);
-                        break;
-                    case R.id.dashboard:
-                        findViewById(R.id.dashboard_wrapper).setVisibility(View.VISIBLE);
-                        findViewById(R.id.led_wrapper).setVisibility(View.VISIBLE);
-                        findViewById(R.id.location_wrapper).setVisibility(View.VISIBLE);
-                        findViewById(R.id.line_wrapper).setVisibility(View.GONE);
-                        findViewById(R.id.temp_wrapper).setVisibility(View.GONE);
-                        break;
-                }
-                return true;
-            }
-        });
     }
 
     private void openUART() {
