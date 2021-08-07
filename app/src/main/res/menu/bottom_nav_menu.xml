@@ -1,19 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/home"
-        android:icon="@drawable/ic_action_dashboard"
-        android:title="Dashboard" />
 
-    <item
-        android:id="@+id/chart"
-        android:icon="@drawable/ic_action_name"
-        android:title="Chart" />
-
-    <item
-        android:id="@+id/map"
+    <item android:title="Home"
+        android:icon="@drawable/ic_baseline_home"
+        android:id="@+id/home"/>
+    <item android:title="Map"
         android:icon="@drawable/ic_baseline_map"
-        android:title="Map" />
-
-
+        android:id="@+id/map"/>
 </menu>

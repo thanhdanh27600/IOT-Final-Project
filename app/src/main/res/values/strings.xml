@@ -1,11 +1,11 @@
 <resources>
-    <string name="app_name">IOT-Final</string>
+    <string name="app_name">Google Map</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_bottom_navigation">MainActivity</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
-    <string name="channel_name">IOT Final</string>
-    <string name="channel_description">The notification of IOT from Adafruit</string>
+    <string name="maps_api_key">AIzaSyBcF2EGs07RiB5LkVzsxIA-XAe6iwnX6kY</string>
+    <string name="title_activity_maps">Current Place Details</string>
+    <string name="default_info_title">Default Location</string>
+    <string name="default_info_snippet">No places found, because location permission is disabled.</string>
+    <string name="option_get_place">Get place</string>
+    <string name="pick_place">Choose a place</string>
 </resources>
