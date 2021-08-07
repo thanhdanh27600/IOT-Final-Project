@@ -45,12 +45,13 @@ public class map extends Fragment implements OnMapReadyCallback {
 
     private MapView mapView;
     private GoogleMap googleMap;
+    double top, bottom, right, left;
     //------------------------------------------------------------------
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
     private static final String TAG = map.class.getSimpleName();
-    private final LatLng defaultLocation = new LatLng(-33.8523341, 151.2106085);
+    private final LatLng defaultLocation = new LatLng(10.773398693655993, 106.66074607202671);
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -95,8 +96,7 @@ public class map extends Fragment implements OnMapReadyCallback {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
-        Log.d("map","onCreate");
-
+        Log.d("map", "onCreate");
     }
 
     @Override
@@ -120,11 +120,6 @@ public class map extends Fragment implements OnMapReadyCallback {
     public void onMapReady(@NonNull GoogleMap map) {
         googleMap = map;
         Log.d("map","onMapReady");
-//        LatLng BK = new LatLng(10.773356670189159, 106.66076429041705);
-//        googleMap.addMarker(new MarkerOptions()
-//                .position(BK)
-//                .title("CSE Faculty"));
-//        googleMap.moveCamera(CameraUpdateFactory.newLatLng(BK));
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -133,19 +128,31 @@ public class map extends Fragment implements OnMapReadyCallback {
             return;
         }
         googleMap.setMyLocationEnabled(true);
-        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Location location = task.getResult();
-                double top, bottom, right, left;
-                top = location.getLatitude() + .001;
-                bottom = location.getLatitude() - .001;
-                right = location.getLongitude() + .001;
-                left = location.getLongitude() - .001;
-                LatLngBounds cameraFrameBoundary = new LatLngBounds(
-                        new LatLng(bottom, left),
-                        new LatLng(top, right)
-                );
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(cameraFrameBoundary, 0));
+        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+            @Override
+            public void onComplete(@NonNull Task<Location> task) {
+                if (task.isComplete() && task.isSuccessful()) {
+                    Location location = task.getResult();
+                    try {
+                        top = location.getLatitude() + .01;
+                        bottom = location.getLatitude() - .01;
+                        right = location.getLongitude() + .01;
+                        left = location.getLongitude() - .01;
+
+                        LatLngBounds cameraFrameBoundary = new LatLngBounds(
+                                new LatLng(bottom, left),
+                                new LatLng(top, right)
+                        );
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(cameraFrameBoundary, 0));
+                    } catch (Exception e) {
+                        Log.d("Map", String.valueOf((int)defaultLocation.latitude) + ":" + String.valueOf((int)defaultLocation.longitude));
+                        LatLng BK = new LatLng(defaultLocation.latitude, defaultLocation.longitude);
+                        googleMap.addMarker(new MarkerOptions()
+                                .position(BK)
+                                .title("CSE Faculty"));
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLng(BK));
+                    }
+                }
             }
         });
     }
