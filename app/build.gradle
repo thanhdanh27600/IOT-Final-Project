@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'com.google.secrets_gradle_plugin' version '0.5'
 }
 
 android {
@@ -54,4 +55,7 @@ dependencies {
     implementation 'com.squareup.okhttp:okhttp:2.4.0'
     implementation 'com.jjoe64:graphview:4.2.2'
     implementation 'com.google.android.material:material:1.2.0'
+    implementation 'com.google.android.gms:play-services-location:18.0.0'
+    implementation 'com.google.android.gms:play-services-maps:17.0.1'
+
 }
