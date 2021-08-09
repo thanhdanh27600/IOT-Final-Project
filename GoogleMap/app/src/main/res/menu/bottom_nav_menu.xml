@@ -7,4 +7,7 @@
     <item android:title="Map"
         android:icon="@drawable/ic_baseline_map"
         android:id="@+id/map"/>
+    <item android:title="Settings"
+        android:icon="@drawable/ic_baseline_settings"
+        android:id="@+id/setting"/>
 </menu>
