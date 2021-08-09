@@ -43,14 +43,22 @@ def decrypt(key, content):
     return decrypted_content
 
 def receiveDataUart():
-    global received_message_uart, key
+    global received_message_uart, key, time, counter
     received_message_uart = received_message_uart + str(uart.read(), 'UTF-8')
     if ('#' in received_message_uart) and ('!' in received_message_uart):
+        start = received_message_uart.find('#') + 1
+        end = received_message_uart.find('!')
         #display.scroll(decrypt(key, received_message_uart[1:-1]), 50)
-        if (decrypt(key, received_message_uart[1:-1]) == '1'):
-            display.show(led_on)
-        if (decrypt(key, received_message_uart[1:-1]) == '0'):
-            display.show(led_off)
+        decrypted_message = decrypt(key, received_message_uart[start:end])
+        splited_message = decrypted_message.split(':')
+        if (splited_message[0] == 'l'): #this is the requirement
+            if (splited_message[1] == '1'):
+                display.show(led_on)
+            elif (splited_message[1] == '0'):
+                display.show(led_off)
+        elif (splited_message[0] == 't'):
+            time = int(splited_message[1], 10)
+            counter = 0
         #radio.send(received_message_uart)
         received_message_uart = ''
 
@@ -133,7 +141,7 @@ def process():
         data['t'] = old_temperature
         old_direction = new_direction
 
-    if (counter == time):
+    if (counter >= time):
         old_temperature = getTemperature()
         old_light_level = getLightLevel()
         data['a'] = old_gesture
