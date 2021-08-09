@@ -83,9 +83,11 @@ public class setting extends Fragment {
 
             @Override
             public void onStopTrackingTouch(@NonNull RangeSlider slider) {
-                //
                 List timerValue = timer.getValues();
-                Log.d("Timer", timerValue.get(0).toString());
+                int returnTimerValue = Math.round((Float) timerValue.get(0));
+                Log.d("Timer", returnTimerValue+"");
+                //do something
+
             }
         });
 
@@ -98,17 +100,23 @@ public class setting extends Fragment {
             @Override
             public void onStopTrackingTouch(@NonNull RangeSlider slider) {
                 List lightValues = light.getValues();
-                Log.d("Timer", "Min:" + lightValues.get(0) + " | Max:" + lightValues.get(1));
+                int returnMinLightThreshold = Math.round((Float) lightValues.get(0));
+                int returnMaxLightThreshold = Math.round((Float) lightValues.get(1));
+                Log.d("Timer", "Min:" + returnMinLightThreshold + " | Max:" + returnMaxLightThreshold);
+                //do something
+
             }
         });
 
         autoLight.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
-                //add Model-View
                 light.setEnabled(true);
+                //do something
+
             } else {
-                //add Model-View
                 light.setEnabled(false);
+                //do something
+
             }
         });
         return view;
