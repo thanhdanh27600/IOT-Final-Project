@@ -51,6 +51,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Timer;
@@ -61,9 +62,11 @@ import java.util.concurrent.Executors;
 public class MainActivity extends AppCompatActivity implements SerialInputOutputManager.Listener {
 
 
-    public class Constants {
+    public static class Constants {
         private static final char KEY = 69;
-
+        public static int UPLOAD_PERIOD = 30;
+        public static int minLightThreshold = -1;
+        public static int maxLightThreshold = -1;
         public static final int NUM_SENSORS = 7;
         public static final int TOPIC_LIGHT = 0;
         public static final int TOPIC_TEMPERATURE = 1;
@@ -73,10 +76,9 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
         public static final int TOPIC_LATITUDE = 5;
         public static final int TOPIC_LED = 6;
         public static final int MAX_X = 70;
-        public static final int UPLOAD_PERIOD = 30;
         public static final String CHANNEL_ID = "Adafruit";
         public static final String TOPIC_LED_PATH = "thanhdanh27600/f/iot-led";
-        public static final int SEND_LOCATION_FLAG = 1;
+        public static final int SEND_LOCATION_FLAG = 0;
     }
 
     double buffer_index = 0d;
@@ -254,6 +256,28 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
                 sendDataMQTT(item.accelerometer, Constants.TOPIC_ACCELEROMETER);
                 item.send_accelerometer = false;
             }
+            if(item.lightThreshold[0] != -1){
+                Log.i("FROM MAIN, light", item.lightThreshold[0] + "-"+item.lightThreshold[1]);
+                Constants.minLightThreshold = item.lightThreshold[0];
+                Constants.maxLightThreshold = item.lightThreshold[1];
+                item.lightThreshold[0] = -1;
+            }
+            if(item.timerSetting != -1){
+                Log.i("FROM MAIN, timerSetting", item.timerSetting + "");
+                //change timer period
+                Constants.UPLOAD_PERIOD = item.timerSetting;
+                wdt_counter = item.timerSetting;
+                String dataToGateway = "t:" + item.timerSetting;
+                messageUART = new EncryptionUART(dataToGateway, Constants.KEY);
+                dataToGateway = messageUART.encryptUART();
+                dataToGateway = "#" + dataToGateway + "!";
+                try {
+                    if(port != null) port.write(dataToGateway.getBytes(), 1000);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                item.timerSetting = -1;
+            }
 
         });
 
@@ -293,7 +317,7 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
 
 
     private void setupWDT() {
-        timer.schedule(new MyTimerTask(), 1000, 1000);
+        timer.schedule(new MyTimerTask(), 3000, 1000);
     }
 
     private void initNotificationChannel() {
@@ -384,14 +408,14 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
                         String dataToGateway = "";
                         switch (mqttMessage.toString()) {
                             case "ON":
-                                dataToGateway = "1";
+                                dataToGateway = "l:1";
                                 break;
                             default:
-                                dataToGateway = "0";
+                                dataToGateway = "l:0";
                         }
                         messageUART = new EncryptionUART(dataToGateway, Constants.KEY);
                         dataToGateway = messageUART.encryptUART();
-                        dataToGateway = "!" + dataToGateway + "#";
+                        dataToGateway = "#" + dataToGateway + "!";
                         port.write(dataToGateway.getBytes(), 1000);
                         break;
                     default:
@@ -407,10 +431,21 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
         });
     }
 
-    private void updateLightTemp() {
+    private void updateLightTemp() throws IOException {
         item.latest_light_value = latest_light_value;
         item.latest_temp_value = latest_temp_value;
         viewModel.selectItem(item);
+        String dataToGateway = "";
+        if( Constants.minLightThreshold <= latest_light_value && latest_temp_value <= Constants.maxLightThreshold){
+            dataToGateway = "l:1";
+        }
+        else{
+            dataToGateway = "l:0";
+        }
+        messageUART = new EncryptionUART(dataToGateway, Constants.KEY);
+        dataToGateway = messageUART.encryptUART();
+        dataToGateway = "#" + dataToGateway + "!";
+        if(port !=null) port.write(dataToGateway.getBytes(), 1000);
     }
 
 
@@ -470,7 +505,11 @@ public class MainActivity extends AppCompatActivity implements SerialInputOutput
                     wdt_counter--;
                     if (wdt_counter < 0) {
                         wdt_counter = Constants.UPLOAD_PERIOD;
-                        updateLightTemp();
+                        try {
+                            updateLightTemp();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         MapObj obj = new MapObj("Danh", latitude, longitude);
                         if (Constants.SEND_LOCATION_FLAG == 1) sendObjMQTT(obj);
                     }

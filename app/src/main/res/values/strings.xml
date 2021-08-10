@@ -4,4 +4,5 @@
     <string name="channel_name">IOT Final</string>
     <string name="channel_description">The notification of IOT from Adafruit</string>
     <string name="maps_api_key">AIzaSyBcF2EGs07RiB5LkVzsxIA-XAe6iwnX6kY</string>
+    <string name="range_slider">Timer</string>
 </resources>

@@ -15,5 +15,8 @@
         android:icon="@drawable/ic_baseline_map"
         android:title="Map" />
 
+    <item android:title="Settings"
+        android:icon="@drawable/ic_baseline_settings"
+        android:id="@+id/setting"/>
 
 </menu>

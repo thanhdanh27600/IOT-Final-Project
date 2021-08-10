@@ -19,4 +19,9 @@
         android:name="com.example.iot_final.chart"
         android:label="fragment_chart"
         tools:layout="@layout/fragment_chart" />
+    <fragment
+        android:id="@+id/setting"
+        android:name="com.example.iot_final.setting"
+        android:label="fragment_setting"
+        tools:layout="@layout/fragment_setting" />
 </navigation>

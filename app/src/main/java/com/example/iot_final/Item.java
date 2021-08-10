@@ -21,4 +21,8 @@ public class Item {
     // Longitude and Latitude
     public static double longitude;
     public static double latitude;
+
+    //setting values
+    public static int[] lightThreshold = {-1,-1};
+    public static int timerSetting = -1;
 }
